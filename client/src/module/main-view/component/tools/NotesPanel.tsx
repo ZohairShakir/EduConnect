@@ -1,6 +1,7 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "../../../../components/ui/Button";
 import { Card } from "../../../../components/ui/Card";
+import { useMeetingService } from "../../../meeting/MeetingProvider";
 
 function simpleSummarize(text: string): string {
   const cleaned = text.replace(/\s+/g, " ").trim();
@@ -11,8 +12,11 @@ function simpleSummarize(text: string): string {
 }
 
 export const NotesPanel: React.FC = () => {
+  const { isOrganizer } = useMeetingService();
   const [transcript, setTranscript] = useState("");
   const [notes, setNotes] = useState("");
+  const [autoNotes, setAutoNotes] = useState(true);
+  const recRef = useRef<any>(null);
 
   const canSpeech = useMemo(
     () =>
@@ -27,6 +31,7 @@ export const NotesPanel: React.FC = () => {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SR) return;
     const rec = new SR();
+    recRef.current = rec;
     rec.continuous = true;
     rec.interimResults = true;
     rec.lang = "en-US";
@@ -39,8 +44,22 @@ export const NotesPanel: React.FC = () => {
       if (finalText) setTranscript((prev) => (prev + " " + finalText).trim());
     };
     rec.start();
-    alert("Live transcript started (browser-based). Close this alert and speak.");
   };
+
+  const stopLocalTranscript = () => {
+    try {
+      recRef.current?.stop?.();
+    } catch {}
+    recRef.current = null;
+  };
+
+  useEffect(() => {
+    if (!autoNotes) return;
+    const id = window.setTimeout(() => {
+      setNotes(simpleSummarize(transcript));
+    }, 500);
+    return () => window.clearTimeout(id);
+  }, [autoNotes, transcript]);
 
   return (
     <div className="p-4 flex flex-col gap-4">
@@ -71,7 +90,7 @@ export const NotesPanel: React.FC = () => {
           </div>
         </div>
 
-        <div className="mt-4 flex flex-wrap gap-2">
+        <div className="mt-4 flex flex-wrap items-center gap-3">
           <Button
             variant="ghost"
             onClick={startLocalTranscript}
@@ -79,9 +98,25 @@ export const NotesPanel: React.FC = () => {
           >
             Start transcript
           </Button>
+          <Button variant="ghost" onClick={stopLocalTranscript}>
+            Stop
+          </Button>
+          <label className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
+            <input
+              type="checkbox"
+              checked={autoNotes}
+              onChange={(e) => setAutoNotes(e.target.checked)}
+            />
+            Auto-generate notes
+          </label>
           {!canSpeech && (
             <span className="text-xs text-[var(--text-muted)]">
               SpeechRecognition not supported in this browser — paste transcript manually.
+            </span>
+          )}
+          {isOrganizer && canSpeech && (
+            <span className="text-xs text-[var(--text-muted)]">
+              Tip: click “Start transcript” once to allow mic, then it will keep taking notes while you speak.
             </span>
           )}
         </div>

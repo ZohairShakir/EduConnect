@@ -21,9 +21,12 @@ export const RaiseDoubtButton: React.FC = () => {
       time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
     };
     sendMessage({ type: "doubt", message });
-    // also show locally (useful for the host too)
+    // also persist locally immediately
     try {
-      window.dispatchEvent(new CustomEvent("educonnect:doubt", { detail: message }));
+      // lazy import to avoid circular deps in build graph
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const { toolsStore } = require("../../../toolsStore");
+      toolsStore.addDoubt(message);
     } catch {}
     setIsOpen(false);
     setText("");

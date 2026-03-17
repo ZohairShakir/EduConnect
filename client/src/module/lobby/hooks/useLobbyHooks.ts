@@ -10,10 +10,13 @@ export const useLobbyHooks = () => {
   const [nameValidationError, setNameValidationError] = useState("");
   const [name, setName] = useState("");
   const [sessionTitle, setSessionTitle] = useState<string>("");
-  const { updateMember, localSocketId } = useMember();
+  const { updateMember, localSocketId, members } = useMember();
 
   const updateName = () => {
-    updateMember({ memberId: localSocketId!, updatedDetails: { name } });
+    // Update the *actual local member record* (more reliable than localSocketId timing).
+    const localMemberId = members[0]?.memberId || localSocketId;
+    if (!localMemberId) return;
+    updateMember({ memberId: localMemberId, updatedDetails: { name } });
   };
 
   const handleNameChange = (event: any) => {

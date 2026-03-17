@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useMember } from "../../../members/MemberServiceContext";
+import { toolsStore } from "../../toolsStore";
 
 export type DoubtEvent = {
   memberId: string;
@@ -9,17 +10,13 @@ export type DoubtEvent = {
 
 export const DoubtsPanel: React.FC = () => {
   const { getMember } = useMember();
-  const [doubts, setDoubts] = useState<DoubtEvent[]>([]);
+  const [doubts, setDoubts] = useState<DoubtEvent[]>(() =>
+    toolsStore.getDoubts()
+  );
 
   useEffect(() => {
-    const handler = (e: Event) => {
-      const ce = e as CustomEvent<DoubtEvent>;
-      if (!ce.detail) return;
-      setDoubts((prev) => [ce.detail, ...prev]);
-    };
-    window.addEventListener("educonnect:doubt", handler as EventListener);
-    return () =>
-      window.removeEventListener("educonnect:doubt", handler as EventListener);
+    const unsub = toolsStore.subscribe(() => setDoubts(toolsStore.getDoubts()));
+    return () => unsub();
   }, []);
 
   const rows = useMemo(

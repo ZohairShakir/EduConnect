@@ -9,6 +9,7 @@ import { useGetRemoteStreams } from "./useGetRemoteStreams"
 import { useGetMembers } from "./useGetMembers"
 import { useMediaService } from "../../media/useMediaService"
 import { ChatMessage } from "../../main-view/component/chat/Types"
+import { toolsStore } from "../../main-view/toolsStore"
 
 export const useMemberHooks = (): MemberServiceState => {
   const [chatMessage, setChatMessage] = useState<ChatMessage[]>([])
@@ -133,14 +134,16 @@ export const useMemberHooks = (): MemberServiceState => {
         const message: ChatMessage = payload.message
         setChatMessage((prevMessages) => [...prevMessages, message])
       } else if (payload.type === "doubt") {
-        // Broadcast as a UI event so meeting panels can react without coupling to MemberService types.
+        // Persist + broadcast as a UI event so panels can render even if not currently open.
         try {
+          toolsStore.addDoubt(payload.message)
           window.dispatchEvent(
             new CustomEvent("educonnect:doubt", { detail: payload.message })
           )
         } catch {}
       } else if (payload.type === "whiteboard") {
         try {
+          toolsStore.applyWhiteboardEvent(payload.event)
           window.dispatchEvent(
             new CustomEvent("educonnect:whiteboard", { detail: payload.event })
           )

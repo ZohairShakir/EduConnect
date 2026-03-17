@@ -1,13 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useMember } from "../../../members/MemberServiceContext";
 import { Button } from "../../../../components/ui/Button";
+import { toolsStore } from "../../toolsStore";
 
 type Point = { x: number; y: number };
 type Stroke = { color: string; width: number; points: Point[] };
-
-type WhiteboardEvent =
-  | { kind: "stroke"; stroke: Stroke }
-  | { kind: "clear" };
 
 function getCanvasPoint(e: PointerEvent, canvas: HTMLCanvasElement): Point {
   const rect = canvas.getBoundingClientRect();
@@ -20,7 +17,9 @@ export const WhiteboardPanel: React.FC = () => {
   const drawingRef = useRef<boolean>(false);
   const currentStrokeRef = useRef<Stroke | null>(null);
 
-  const [strokes, setStrokes] = useState<Stroke[]>([]);
+  const [strokes, setStrokes] = useState<Stroke[]>(() =>
+    toolsStore.getWhiteboardStrokes()
+  );
   const [color, setColor] = useState("#2F80ED");
   const [width, setWidth] = useState(2);
 
@@ -28,22 +27,10 @@ export const WhiteboardPanel: React.FC = () => {
 
   // Receive remote events
   useEffect(() => {
-    const handler = (e: Event) => {
-      const ce = e as CustomEvent;
-      const detail = ce.detail as WhiteboardEvent | undefined;
-      if (!detail) return;
-      if (detail.kind === "clear") {
-        setStrokes([]);
-      } else if (detail.kind === "stroke") {
-        setStrokes((prev) => [...prev, detail.stroke]);
-      }
-    };
-    window.addEventListener("educonnect:whiteboard", handler as EventListener);
-    return () =>
-      window.removeEventListener(
-        "educonnect:whiteboard",
-        handler as EventListener
-      );
+    const unsub = toolsStore.subscribe(() =>
+      setStrokes(toolsStore.getWhiteboardStrokes())
+    );
+    return () => unsub();
   }, []);
 
   // Render strokes
@@ -116,6 +103,7 @@ export const WhiteboardPanel: React.FC = () => {
       currentStrokeRef.current = null;
       if (stroke && stroke.points.length > 1) {
         // broadcast finalized stroke
+        toolsStore.applyWhiteboardEvent({ kind: "stroke", stroke });
         const payload = { type: "whiteboard", event: { kind: "stroke", stroke } };
         sendMessage(payload);
       }
@@ -137,7 +125,7 @@ export const WhiteboardPanel: React.FC = () => {
   }, [color, width, sendMessage]);
 
   const onClear = () => {
-    setStrokes([]);
+    toolsStore.applyWhiteboardEvent({ kind: "clear" });
     sendMessage({ type: "whiteboard", event: { kind: "clear" } });
   };
 
