@@ -1,10 +1,13 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { BsHouseDoor, BsCollectionPlay, BsGear } from 'react-icons/bs';
+import { useAuth } from '../../module/auth/AuthContext';
 
 export const Sidebar: React.FC = () => {
   const location = useLocation();
   const currentPath = location.pathname;
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
 
   const navItems = [
     { label: 'Dashboard', path: '/app', icon: <BsHouseDoor size={18} /> },
@@ -46,12 +49,22 @@ export const Sidebar: React.FC = () => {
       
       <div className="px-6 mt-auto">
         <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--text-muted)] text-white font-semibold">
-            ?
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--bg-secondary)] text-[var(--text-primary)] font-semibold border border-[var(--border-subtle)]">
+            {(user?.name?.slice(0, 1) || "?").toUpperCase()}
           </div>
           <div className="flex flex-col">
-            <span className="text-sm font-medium text-[var(--text-primary)]">User</span>
-            <Link to="/login" className="text-xs text-[var(--text-secondary)] hover:text-[var(--accent-primary)]">Sign out</Link>
+            <span className="text-sm font-medium text-[var(--text-primary)]">
+              {user?.name || "Guest"}
+            </span>
+            <button
+              className="text-left text-xs text-[var(--text-secondary)] hover:text-[var(--accent-primary)]"
+              onClick={() => {
+                logout();
+                navigate("/login");
+              }}
+            >
+              Sign out
+            </button>
           </div>
         </div>
       </div>

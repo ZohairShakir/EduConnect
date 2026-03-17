@@ -1,14 +1,16 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMeetingService } from "../../meeting/MeetingProvider";
 import { useMember } from "../../members/MemberServiceContext";
 import { useRTC } from "../../rtc/RtcProvider";
 import { createSession } from "../../api/sessionsApi";
+import { useAuth } from "../../auth/AuthContext";
 
 export const useLobbyHooks = () => {
+  const { user } = useAuth();
   const { send } = useRTC();
   const { setMeetingId, setMeetingStatus, setIsOrganizer } = useMeetingService();
   const [nameValidationError, setNameValidationError] = useState("");
-  const [name, setName] = useState("");
+  const [name, setName] = useState(user?.name ?? "");
   const [sessionTitle, setSessionTitle] = useState<string>("");
   const { updateMember, localSocketId, members } = useMember();
 
@@ -23,6 +25,18 @@ export const useLobbyHooks = () => {
     setName(event.target.value);
     setNameValidationError("");
   };
+
+  // Keep lobby name in sync with logged-in profile (and with local member record)
+  useEffect(() => {
+    if (!user?.name) return;
+    setName((prev) => (prev?.trim() ? prev : user.name));
+  }, [user?.name]);
+
+  useEffect(() => {
+    if (!name.trim()) return;
+    updateName();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [members?.[0]?.memberId]);
 
   const validateName = () => {
     if (!name.trim()) {

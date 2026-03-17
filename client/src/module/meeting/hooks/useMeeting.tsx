@@ -6,6 +6,16 @@ export const useMeeting = (): MeetingServiceTypes => {
   const [meetingStatus, setMeetingStatus] =
     useState<meetingStatus>("not-created");
   const [isOrganizer, setIsOrganizer] = useState<boolean>(false);
+  const [joinedAtMs, setJoinedAtMs] = useState<number | null>(null);
 
-  return { meetingId, setMeetingId, meetingStatus, setMeetingStatus, isOrganizer, setIsOrganizer};
+  return {
+    meetingId,
+    setMeetingId,
+    meetingStatus,
+    setMeetingStatus,
+    isOrganizer,
+    setIsOrganizer,
+    joinedAtMs,
+    setJoinedAtMs,
+  };
 };

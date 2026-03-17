@@ -9,4 +9,6 @@ export interface MeetingServiceTypes {
   setMeetingStatus: Dispatch<SetStateAction<meetingStatus>>;
   isOrganizer: boolean;
   setIsOrganizer: Dispatch<SetStateAction<boolean>>;
+  joinedAtMs: number | null;
+  setJoinedAtMs: Dispatch<SetStateAction<number | null>>;
 }

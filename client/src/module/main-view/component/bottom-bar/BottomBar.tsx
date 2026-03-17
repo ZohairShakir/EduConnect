@@ -2,6 +2,7 @@ import React from "react";
 import { useMediaService } from "../../../media/useMediaService";
 import { useMainViewAdapter } from "../../hooks/useMainViewAdapter";
 import { TimeDisplay } from "./TimeDisplay";
+import { SessionDuration } from "./SessionDuration";
 import { LeaveButton } from "./button/LeaveButton";
 import { MicrophoneButton } from "./button/MicrophoneButton";
 import { WebCamButton } from "./button/WebCamButton";
@@ -23,7 +24,10 @@ export const BottomBar = () => {
   return (
     <div className="flex items-center justify-between w-full max-w-[1400px]">
       <div className="flex-1 flex justify-start pl-4">
-        <TimeDisplay />
+        <div className="flex flex-col gap-1">
+          <TimeDisplay />
+          <SessionDuration />
+        </div>
       </div>
       
       <div className="flex-1 flex justify-center items-center gap-3">

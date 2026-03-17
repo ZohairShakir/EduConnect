@@ -14,7 +14,7 @@ export const SessionEndedOrLeftDialog = (
   const onClose = () => {
     window.close();
     // Fallback for browsers that don't allow window.close()
-    window.location.href = "/";
+    window.location.href = "/app";
   };
 
   if (!isMeetingEnded && !isLeftMeeting) return null;
