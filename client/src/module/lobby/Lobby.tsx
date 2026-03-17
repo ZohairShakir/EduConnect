@@ -52,7 +52,7 @@ export const Lobby = () => {
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
         
         {/* Left Column */}
-        <div className="flex flex-col gap-6 lg:col-span-5 relative z-10">
+        <div className="flex flex-col gap-6 lg:col-span-5 relative z-20">
           <Card>
             <h3 className="mb-4 text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">Camera Preview</h3>
             <LocalWebCamStreamContainer />
@@ -78,7 +78,7 @@ export const Lobby = () => {
             </div>
           </Card>
 
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3 relative z-30 pointer-events-auto">
             <Button onClick={handleCreateMeeting}>
               <svg className="mr-2" width="16" height="16" viewBox="0 0 24 24" fill="none">
                 <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"/>

@@ -6,7 +6,7 @@ import { useRTC } from "../../../../rtc/RtcProvider";
 import { useMediaService } from "../../../../media/useMediaService";
 
 export const useJoinMeetingHooks = () => {
-  const { setMeetingStatus } = useMeetingService();
+  const { setMeetingStatus, setJoinedAtMs } = useMeetingService();
   const { send, listen } = useRTC();
   const { members, updateStream } = useMember();
   const { webCamStream, isWebCamEnabled } = useMediaService();
@@ -56,6 +56,7 @@ export const useJoinMeetingHooks = () => {
     });
     navigate(`/meet/${meetingId}`);
     setMeetingStatus(status);
+    setJoinedAtMs(Date.now());
   };
 
   return {

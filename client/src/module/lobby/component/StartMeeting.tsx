@@ -8,7 +8,7 @@ import { Button } from "../../../components/ui/Button"
 import { Card } from "../../../components/ui/Card"
 
 export const StartMeeting = () => {
-  const { meetingId, setIsOrganizer, setMeetingStatus } = useMeetingService()
+  const { meetingId, setIsOrganizer, setMeetingStatus, setJoinedAtMs } = useMeetingService()
   const { members, updateStream } = useMember()
   const { send } = useRTC()
   const navigate = useNavigate()
@@ -27,6 +27,7 @@ export const StartMeeting = () => {
     send("start-meeting", { meetingId })
     setIsOrganizer(true)
     setMeetingStatus("started")
+    setJoinedAtMs(Date.now())
     if (members.length > 0) {
       const { memberId } = members[0]
       updateStream({

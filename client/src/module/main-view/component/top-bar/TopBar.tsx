@@ -1,9 +1,12 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { InfoDialog } from "./InfoDialog";
 import { PanelType } from "../../MainView";
 import { ChatButton } from "./ChatButton";
 import { PeoplePanelButton } from "./PeoplePanelButton";
 import { Button } from "../../../../components/ui/Button";
+import { toolsStore } from "../../toolsStore";
+import { useMeetingService } from "../../../meeting/MeetingProvider";
+import { useMember } from "../../../members/MemberServiceContext";
 
 interface TopBarProps {
   onIconClick: (panel: PanelType) => void;
@@ -11,6 +14,27 @@ interface TopBarProps {
 }
 
 export const TopBar = ({ onIconClick, activePanel }: TopBarProps) => {
+  const { isOrganizer } = useMeetingService();
+  const { getMember } = useMember();
+  const [doubtToast, setDoubtToast] = useState<string | null>(null);
+  const lastDoubtCountRef = useRef<number>(toolsStore.getDoubts().length);
+
+  useEffect(() => {
+    if (!isOrganizer) return;
+    const unsub = toolsStore.subscribe(() => {
+      const curr = toolsStore.getDoubts().length;
+      if (curr > lastDoubtCountRef.current) {
+        const latest = toolsStore.getLatestDoubt();
+        const sender = latest ? getMember(latest.memberId) : undefined;
+        const who = sender?.name ?? "A participant";
+        setDoubtToast(`${who} raised a doubt — open Doubts`);
+        window.setTimeout(() => setDoubtToast(null), 4500);
+      }
+      lastDoubtCountRef.current = curr;
+    });
+    return () => unsub();
+  }, [getMember, isOrganizer]);
+
   const isPeoplePanelActive = activePanel === PanelType.people;
   const isChatPanelActive = activePanel === PanelType.chat;
   const isDoubtsActive = activePanel === PanelType.doubts;
@@ -23,6 +47,11 @@ export const TopBar = ({ onIconClick, activePanel }: TopBarProps) => {
         <InfoDialog />
         <div className="h-4 w-px bg-[var(--border-subtle)] mx-2" />
         <span className="text-sm font-semibold text-[var(--text-primary)]">Classroom</span>
+        {doubtToast && (
+          <div className="ml-3 rounded-full border border-[var(--border-subtle)] bg-[var(--bg-secondary)] px-3 py-1 text-xs text-[var(--text-secondary)]">
+            {doubtToast}
+          </div>
+        )}
       </div>
       
       <div className="flex items-center gap-2">

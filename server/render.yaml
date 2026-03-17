@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: educonnect-server
+    env: node
+    rootDir: server
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true
+      # Set this in Render dashboard to your Netlify site URL, e.g. https://educonnect.netlify.app
+      - key: CORS_ORIGIN
+        value: "*"

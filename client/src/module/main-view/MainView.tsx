@@ -18,8 +18,14 @@ export enum PanelType {
 export const MainView = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [activePanel, setActivePanel] = useState<PanelType>(PanelType.none);
-  const { meetingId } = useMeetingService();
+  const { meetingId, joinedAtMs, setJoinedAtMs } = useMeetingService();
   const { send } = useRTC();
+
+  useEffect(() => {
+    // If user refreshes while in-meeting, ensure timer still starts.
+    if (!joinedAtMs) setJoinedAtMs(Date.now());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     const onBeforeUnload = () => {

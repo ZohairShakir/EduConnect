@@ -24,6 +24,7 @@ export const toolsStore = {
     emit();
   },
   getDoubts: () => doubts,
+  getLatestDoubt: () => doubts[0],
 
   // --- Whiteboard ---
   applyWhiteboardEvent: (e: WhiteboardEvent) => {

@@ -11,8 +11,11 @@ import { createUser, getUserByEmail, UserRole } from "./store/userStore";
 import { signUserToken } from "./auth/auth";
 
 const app = express();
-app.use(cors({ origin: true }));
+const corsOrigin = process.env.CORS_ORIGIN || true;
+app.use(cors({ origin: corsOrigin as any }));
 app.use(express.json());
+
+app.get("/health", (_req, res) => res.json({ ok: true }));
 
 // --- Auth API ---
 app.post("/auth/signup", async (req, res) => {
@@ -94,7 +97,7 @@ app.get("/sessions/host/:hostId", (req, res) => {
 
 const httpServer = createServer(app);
 const io: SocketIOServer = new SocketIOServer(httpServer, {
-  cors: { origin: true, methods: ["GET", "POST"] },
+  cors: { origin: corsOrigin as any, methods: ["GET", "POST"] },
 });
 
 setupSocketHandlers(io);

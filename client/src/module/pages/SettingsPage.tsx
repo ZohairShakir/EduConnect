@@ -3,8 +3,10 @@ import { Layout } from "../../components/layout/Layout";
 import { Card } from "../../components/ui/Card";
 import { Input } from "../../components/ui/Input";
 import { Button } from "../../components/ui/Button";
+import { useAuth } from "../auth/AuthContext";
 
 export const SettingsPage: React.FC = () => {
+  const { user } = useAuth();
   return (
     <Layout title="Settings">
       <div className="flex flex-col gap-6">
@@ -17,12 +19,12 @@ export const SettingsPage: React.FC = () => {
           </p>
 
           <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
-            <Input label="Display name" placeholder="Your name" />
-            <Input label="Email" placeholder="you@example.com" disabled />
+            <Input label="Display name" placeholder="Your name" value={user?.name ?? ""} readOnly />
+            <Input label="Email" placeholder="you@example.com" value={user?.email ?? ""} readOnly />
           </div>
 
           <div className="mt-6 flex justify-end">
-            <Button variant="secondary">Save</Button>
+            <Button variant="secondary" disabled>Save</Button>
           </div>
         </Card>
 

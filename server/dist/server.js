@@ -14,8 +14,10 @@ const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const userStore_1 = require("./store/userStore");
 const auth_1 = require("./auth/auth");
 const app = (0, express_1.default)();
-app.use((0, cors_1.default)({ origin: true }));
+const corsOrigin = process.env.CORS_ORIGIN || true;
+app.use((0, cors_1.default)({ origin: corsOrigin }));
 app.use(express_1.default.json());
+app.get("/health", (_req, res) => res.json({ ok: true }));
 // --- Auth API ---
 app.post("/auth/signup", async (req, res) => {
     const { name, email, password, role } = req.body ?? {};
@@ -90,7 +92,7 @@ app.get("/sessions/host/:hostId", (req, res) => {
 });
 const httpServer = (0, http_1.createServer)(app);
 const io = new socket_io_1.Server(httpServer, {
-    cors: { origin: true, methods: ["GET", "POST"] },
+    cors: { origin: corsOrigin, methods: ["GET", "POST"] },
 });
 (0, socketHandlers_1.setupSocketHandlers)(io);
 const port = process.env.PORT || 3001;
