@@ -4,6 +4,7 @@ import { useMember } from "../../members/MemberServiceContext"
 import { useRTC } from "../../rtc/RtcProvider"
 import { StartConnetionProps } from "../../rtc/types"
 import { ChannelType } from "../../members/types"
+import { useMeetingService } from "../../meeting/MeetingProvider"
 export const useMainViewAdapter = () => {
   const { webCamStream } = useMediaService()
   const {
@@ -16,13 +17,22 @@ export const useMainViewAdapter = () => {
     isMeetingEnded,
   } = useMember()
 
+  const { send, makePeerConnection } = useRTC()
+  const { meetingId } = useMeetingService()
+
   const onleaveSession = useCallback(() => {
+    if (meetingId) {
+      send("leave-meeting", { meetingId })
+    }
     leaveSession()
-  }, [leaveSession])
+  }, [leaveSession, meetingId, send])
 
   const onEndSession = useCallback(() => {
+    if (meetingId) {
+      send("leave-meeting", { meetingId })
+    }
     endSession()
-  }, [endSession])
+  }, [endSession, meetingId, send])
   const {
     isWebCamEnabled,
     toggleWebCam,
@@ -31,8 +41,6 @@ export const useMainViewAdapter = () => {
     displayStream,
     isDisplaySharing,
   } = useMediaService()
-  const { makePeerConnection } = useRTC()
-
   const handleMicButton = () => toggleMic()
 
   const handleWebCamButton = useCallback(async () => {

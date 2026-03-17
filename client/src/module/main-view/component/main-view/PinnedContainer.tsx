@@ -1,13 +1,12 @@
-import { Box, Grid } from "@chakra-ui/react";
 import React from "react";
 import {
   MediaVideoStreamType,
   DisplayVideoStreamType,
   PinnedStreamType,
-  MediaAudioStreamType,
 } from "../../../members/types";
 import { StreamContainer } from "./StreamContainer";
 import { useMember } from "../../../members/MemberServiceContext";
+
 interface PinnedContainerProps {
   pinnedStream: PinnedStreamType;
   handlePin: (pinnedStream: PinnedStreamType) => void;
@@ -21,7 +20,9 @@ export const PinnedContainer = (props: PinnedContainerProps) => {
     remoteStreams.display.filter(
       (display: DisplayVideoStreamType) => display.isEnabled
     ).length;
+    
   const canPinned = totalStreams > 1;
+  
   const filteredVideoStreams =
     pinnedStream &&
     remoteStreams.video.filter(
@@ -56,39 +57,38 @@ export const PinnedContainer = (props: PinnedContainerProps) => {
         pinnedStream.id === display.stream.id
     );
 
-  const columns = Math.ceil(totalStreams / 6);
   return (
-    <>
-      <Box width="14%" height="100%">
-        <Grid
-          templateColumns={`repeat(${columns}, 1fr)`}
-          templateRows="repeat(6, 1fr)"
-          gap={2}
-          height="100%"
-        >
-          {filteredVideoStreams!.map(
-            (video: MediaVideoStreamType, index: number) => (
+    <div className="flex h-full w-full gap-4 p-4 overflow-hidden">
+      {/* Sidebar for non-pinned streams */}
+      <div className="w-[200px] h-full overflow-y-auto pr-2 custom-scrollbar flex flex-col gap-3">
+        {filteredVideoStreams!.map(
+          (video: MediaVideoStreamType, index: number) => (
+            <div key={`side-video-${index}`} className="w-full aspect-video shrink-0">
               <StreamContainer
                 stream={video}
                 isWebCamStream={true}
                 canPinned={canPinned}
                 onPinned={handlePin}
               />
-            )
-          )}
-          {filteredDisplayStreams!.map(
-            (display: DisplayVideoStreamType, index: number) => (
+            </div>
+          )
+        )}
+        {filteredDisplayStreams!.map(
+          (display: DisplayVideoStreamType, index: number) => (
+            <div key={`side-display-${index}`} className="w-full aspect-video shrink-0">
               <StreamContainer
                 stream={display}
                 isWebCamStream={false}
                 canPinned={canPinned}
                 onPinned={handlePin}
               />
-            )
-          )}
-        </Grid>
-      </Box>
-      <Box width="85%" height="100%">
+            </div>
+          )
+        )}
+      </div>
+
+      {/* Main pinned area */}
+      <div className="flex-1 h-full min-h-0">
         <StreamContainer
           stream={
             pinnedStream.videoType === "video"
@@ -99,7 +99,7 @@ export const PinnedContainer = (props: PinnedContainerProps) => {
           canPinned={canPinned}
           onPinned={handlePin}
         />
-      </Box>
-    </>
+      </div>
+    </div>
   );
 };

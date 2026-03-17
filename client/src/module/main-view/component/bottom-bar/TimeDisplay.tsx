@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { Box } from "@chakra-ui/react";
 
 export const TimeDisplay = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -22,8 +21,8 @@ export const TimeDisplay = () => {
   };
 
   return (
-    <Box color="gray.200" fontSize="lg" ml={4} mt={2}>
+    <div className="text-sm font-medium text-[var(--text-secondary)]">
       {formatTime(currentTime)}
-    </Box>
+    </div>
   );
 };

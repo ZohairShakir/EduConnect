@@ -1,30 +1,28 @@
-import { Tooltip, IconButton } from "@chakra-ui/react";
 import React from "react";
 import { FaVideo, FaVideoSlash } from "react-icons/fa";
+
 interface WebCamButtonProps {
   isWebCamEnabled: boolean;
   handleWebCamButton: () => void;
 }
 
 export const WebCamButton = (props: WebCamButtonProps) => {
-    const { isWebCamEnabled, handleWebCamButton } = props;
+  const { isWebCamEnabled, handleWebCamButton } = props;
+  
   return (
-    <Tooltip
-      label={isWebCamEnabled ? "Turn camera off" : "Turn camera on"}
-      hasArrow
-      bg="white"
-      color="black"
+    <button
+      onClick={handleWebCamButton}
+      title={isWebCamEnabled ? "Turn camera off" : "Turn camera on"}
+      className={`
+        flex h-12 w-12 items-center justify-center rounded-full transition-all duration-200 border
+        ${isWebCamEnabled 
+          ? "bg-white text-[var(--text-secondary)] border-[var(--border-subtle)] hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--text-muted)]" 
+          : "bg-red-50 text-red-500 border-red-200 hover:bg-red-100 hover:border-red-300 shadow-sm"
+        }
+      `}
+      aria-label={isWebCamEnabled ? "camera on" : "camera off"}
     >
-      <IconButton
-        isRound
-        icon={isWebCamEnabled ? <FaVideo /> : <FaVideoSlash />}
-        bg="white"
-        color={isWebCamEnabled ? "green.400" : "red.500"}
-        onClick={handleWebCamButton}
-        variant="outline"
-        fontSize="20px"
-        aria-label={isWebCamEnabled ? "camera on" : "camera off"}
-      />
-    </Tooltip>
+      {isWebCamEnabled ? <FaVideo size={18} /> : <FaVideoSlash size={18} />}
+    </button>
   );
 };

@@ -1,0 +1,55 @@
+/* join-meeting.css — Light theme */
+
+.jm-overlay {
+  position: fixed; inset: 0;
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 999;
+  animation: fadeIn 0.2s ease;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.jm-dialog {
+  background: var(--card-bg);
+  border: 1px solid var(--border-muted);
+  border-radius: 14px;
+  width: 100%; max-width: 400px; padding: 28px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.12), 0 0 30px var(--accent-glow);
+  animation: slideUp 0.25s ease;
+}
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+.jm-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
+.jm-title { font-size: 16px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.2px; }
+.jm-close {
+  background: transparent; border: none; color: var(--text-muted);
+  cursor: pointer; padding: 4px; display: flex; align-items: center;
+  border-radius: 6px; transition: color 0.2s, background 0.2s;
+}
+.jm-close:hover { color: var(--text-primary); background: var(--bg-secondary); }
+
+.jm-body { display: flex; flex-direction: column; gap: 6px; }
+.jm-label { font-size: 12px; font-weight: 500; color: var(--text-secondary); }
+
+.jm-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; }
+.jm-btn-cancel {
+  padding: 9px 18px;
+  background: transparent; border: 1px solid var(--border-muted);
+  border-radius: 8px; color: var(--text-muted);
+  font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s;
+}
+.jm-btn-cancel:hover { border-color: var(--text-muted); color: var(--text-secondary); }
+
+.jm-btn-join {
+  padding: 9px 20px;
+  background: var(--gradient-primary); border: none;
+  border-radius: 8px; color: #fff;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  box-shadow: 0 4px 14px var(--accent-glow);
+  transition: opacity 0.2s, transform 0.1s;
+}
+.jm-btn-join:hover { opacity: 0.88; transform: translateY(-1px); }

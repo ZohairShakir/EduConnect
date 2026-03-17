@@ -1,25 +1,17 @@
-import { Avatar, Box } from "@chakra-ui/react";
 import React from "react";
 import ReactPlayer from "react-player";
+
 interface StreamPlayerProps {
   stream: MediaStream;
   name: string;
   isEnabled: boolean;
 }
+
 export const StreamPlayer = (props: StreamPlayerProps) => {
   const { stream, name, isEnabled } = props;
 
   return isEnabled ? (
-    <Box
-      position="relative"
-      width="100%"
-      style={{
-        paddingTop: "75%",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
+    <div className="relative w-full h-full flex justify-center items-center bg-black">
       <ReactPlayer
         url={stream!}
         playing={true}
@@ -31,8 +23,12 @@ export const StreamPlayer = (props: StreamPlayerProps) => {
           left: 0,
         }}
       />
-    </Box>
+    </div>
   ) : (
-    <Avatar name={name} size="2xl" />
+    <div className="flex aspect-video w-full h-full items-center justify-center bg-[var(--bg-secondary)] text-[var(--text-muted)]">
+      <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[var(--accent-primary)] text-white text-2xl font-bold shadow-sm">
+        {name ? name.slice(0, 2).toUpperCase() : "?"}
+      </div>
+    </div>
   );
 };

@@ -8,6 +8,8 @@ import {
   AnswerPayload,
   IceCandidatePayload,
 } from "./types/types";
+import { markJoin, markLeave } from "./store/attendanceStore";
+import { getSessionById, upsertSessionParticipant } from "./store/sessionStore";
 
 const users: { [key: string]: User } = {};
 const meetings: { [key: string]: Meeting } = {};
@@ -28,6 +30,11 @@ export const setupSocketHandlers = (io: Server) => {
 
       console.log(`[socket] create-meeting: ${meetingId}, organizer=${name}, socket=${socket.id}`);
       console.log(`[socket] meetings=${JSON.stringify(meetings[meetingId])}`);
+
+      // If this meetingId corresponds to a REST-created session, attach host as participant.
+      if (getSessionById(meetingId)) {
+        upsertSessionParticipant(meetingId, socket.id, name);
+      }
 
       io.to(socket.id).emit("meeting-created", {
         meetingId,
@@ -71,9 +78,21 @@ export const setupSocketHandlers = (io: Server) => {
         console.log(`[socket] join-meeting: ${meetingId}, name=${name}, status=${status}, socket=${socket.id}`);
         io.to(socket.id).emit("join-meeting-response", { status, meetingId });
 
+        // Attendance + session participant tracking
+        if (getSessionById(meetingId)) {
+          upsertSessionParticipant(meetingId, socket.id, name);
+          markJoin({ sessionId: meetingId, userId: socket.id, name });
+        }
+
         if (status === "started") {
           socket.to(meetingId).emit("new-user-joined", {
             socketId: socket.id,
+            name,
+          });
+
+          socket.to(meetingId).emit("user-joined", {
+            userId: socket.id,
+            sessionId: meetingId,
             name,
           });
         }
@@ -83,6 +102,30 @@ export const setupSocketHandlers = (io: Server) => {
           meetingId,
         });
       }
+    });
+
+    socket.on("leave-meeting", ({ meetingId }: { meetingId: string }) => {
+      if (!meetingId) return;
+      const record = markLeave({ sessionId: meetingId, userId: socket.id });
+      socket.to(meetingId).emit("user-left", {
+        userId: socket.id,
+        sessionId: meetingId,
+        duration: record?.duration,
+      });
+      socket.leave(meetingId);
+    });
+
+    socket.on("disconnect", () => {
+      const user = users[socket.id];
+      if (user?.meetingId) {
+        const record = markLeave({ sessionId: user.meetingId, userId: socket.id });
+        socket.to(user.meetingId).emit("user-left", {
+          userId: socket.id,
+          sessionId: user.meetingId,
+          duration: record?.duration,
+        });
+      }
+      delete users[socket.id];
     });
 
     socket.on("offer", (data: OfferPayload) => {

@@ -132,6 +132,19 @@ export const useMemberHooks = (): MemberServiceState => {
       if (payload.type === "chat") {
         const message: ChatMessage = payload.message
         setChatMessage((prevMessages) => [...prevMessages, message])
+      } else if (payload.type === "doubt") {
+        // Broadcast as a UI event so meeting panels can react without coupling to MemberService types.
+        try {
+          window.dispatchEvent(
+            new CustomEvent("educonnect:doubt", { detail: payload.message })
+          )
+        } catch {}
+      } else if (payload.type === "whiteboard") {
+        try {
+          window.dispatchEvent(
+            new CustomEvent("educonnect:whiteboard", { detail: payload.event })
+          )
+        } catch {}
       } else if (payload.type === "leave") {
         disconnectPeerconnection(remotedId, "display")
         disconnectPeerconnection(remotedId, "media")

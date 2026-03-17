@@ -1,4 +1,3 @@
-import { Flex } from "@chakra-ui/react";
 import React from "react";
 import { useMediaService } from "../../../media/useMediaService";
 import { useMainViewAdapter } from "../../hooks/useMainViewAdapter";
@@ -7,6 +6,7 @@ import { LeaveButton } from "./button/LeaveButton";
 import { MicrophoneButton } from "./button/MicrophoneButton";
 import { WebCamButton } from "./button/WebCamButton";
 import { ScreenShareButton } from "./button/ScreenShareButton";
+import { RaiseDoubtButton } from "./button/RaiseDoubtButton";
 
 export const BottomBar = () => {
   const { isMicEnabled, isWebCamEnabled, isDisplaySharing } = useMediaService();
@@ -21,11 +21,13 @@ export const BottomBar = () => {
   } = useMainViewAdapter();
 
   return (
-    <Flex align="center" justify="space-between" width="100%">
-      <Flex align="center" justify="flex-start" flex="1">
+    <div className="flex items-center justify-between w-full max-w-[1400px]">
+      <div className="flex-1 flex justify-start pl-4">
         <TimeDisplay />
-      </Flex>
-      <Flex align="center" justify="center" direction="row" flex="1" gap={4}>
+      </div>
+      
+      <div className="flex-1 flex justify-center items-center gap-3">
+        <RaiseDoubtButton />
         <MicrophoneButton
           isMicEnabled={isMicEnabled}
           handleMicButton={handleMicButton}
@@ -38,14 +40,17 @@ export const BottomBar = () => {
           isDisplaySharing={isDisplaySharing}
           handleScreenShareButton={handleScreenShareButton}
         />
+        
+        <div className="w-px h-8 bg-[var(--border-subtle)] mx-2" />
+        
         <LeaveButton
           onLeaveSession={onleaveSession}
           onEndSession={onEndSession}
           isMeetingEnded={isMeetingEnded}
         />
-      </Flex>
+      </div>
 
-      <Flex align="center" justify="flex-center" flex="1"></Flex>
-    </Flex>
+      <div className="flex-1" />
+    </div>
   );
 };

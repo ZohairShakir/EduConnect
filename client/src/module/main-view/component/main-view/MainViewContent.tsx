@@ -1,4 +1,3 @@
-import { Flex } from "@chakra-ui/react";
 import React, { useCallback, useState } from "react";
 import { useMember } from "../../../members/MemberServiceContext";
 import { PinnedStreamType } from "../../../members/types";
@@ -36,13 +35,15 @@ export const MainViewContent: React.FC = () => {
       )?.isEnabled);
 
   return (
-    <Flex height="86%" width="100%" mb={4} px={2}>
+    <div className="h-full w-full flex flex-col items-center justify-center overflow-hidden">
       <AudioPlayers audioStreams={remoteStreams.audio} />
-      {isPinned && pinnedStream ? (
-        <PinnedContainer pinnedStream={pinnedStream} handlePin={handlePin} />
-      ) : (
-        <NormalGridView handlePin={handlePin} />
-      )}
-    </Flex>
+      <div className="flex-1 w-full max-w-[1400px] h-full flex items-center justify-center">
+        {isPinned && pinnedStream ? (
+          <PinnedContainer pinnedStream={pinnedStream} handlePin={handlePin} />
+        ) : (
+          <NormalGridView handlePin={handlePin} />
+        )}
+      </div>
+    </div>
   );
 };

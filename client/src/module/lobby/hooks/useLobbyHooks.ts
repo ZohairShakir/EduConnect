@@ -1,14 +1,15 @@
 import { useState } from "react";
 import { useMeetingService } from "../../meeting/MeetingProvider";
-import { createRandomMeetingId } from "../utils/createMeeting";
 import { useMember } from "../../members/MemberServiceContext";
 import { useRTC } from "../../rtc/RtcProvider";
+import { createSession } from "../../api/sessionsApi";
 
 export const useLobbyHooks = () => {
   const { send } = useRTC();
   const { setMeetingId, setMeetingStatus, setIsOrganizer } = useMeetingService();
   const [nameValidationError, setNameValidationError] = useState("");
   const [name, setName] = useState("");
+  const [sessionTitle, setSessionTitle] = useState<string>("");
   const { updateMember, localSocketId } = useMember();
 
   const updateName = () => {
@@ -34,11 +35,24 @@ export const useLobbyHooks = () => {
     if (!validateName()) {
       return;
     }
-    const meetingId = createRandomMeetingId();
-    setMeetingId(meetingId);
-    setIsOrganizer(true);
-    setMeetingStatus("created");
-    send("create-meeting", { meetingId, name: name });
+    // Meeting IDs are now server-generated sessions. We create a session first,
+    // then create the socket room with that meetingId.
+    if (!localSocketId) {
+      setNameValidationError("Socket not connected yet. Please retry in a moment.");
+      return;
+    }
+
+    createSession({ hostId: localSocketId, title: sessionTitle })
+      .then((session) => {
+        setMeetingId(session.id);
+        setIsOrganizer(true);
+        setMeetingStatus("created");
+        send("create-meeting", { meetingId: session.id, name: name });
+      })
+      .catch((e) => {
+        console.error(e);
+        setNameValidationError("Failed to create session. Is the server running?");
+      });
   };
 
   return {
@@ -47,5 +61,7 @@ export const useLobbyHooks = () => {
     handleNameChange,
     nameValidationError,
     validateName,
+    sessionTitle,
+    setSessionTitle,
   };
 };

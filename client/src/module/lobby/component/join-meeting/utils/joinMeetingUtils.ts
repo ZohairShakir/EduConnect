@@ -1,16 +1,16 @@
 export const joinMeetingUtils = () => {
   const handlemeetingIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newRoom: string = e.target.value;
-    const formattedRoom: string = newRoom.replace(/\D/g, "");
-    const newFormattedRoom: string = formattedRoom
-      .replace(/(\d{3})/g, "$1-")
-      .replace(/-$/, "");
-    return newFormattedRoom;
+    const raw: string = e.target.value;
+    const cleaned = raw.replace(/[^a-zA-Z0-9]/g, "").toUpperCase().slice(0, 8);
+    // Format as XXXX-XXXX for readability
+    const withDash =
+      cleaned.length <= 4 ? cleaned : `${cleaned.slice(0, 4)}-${cleaned.slice(4)}`;
+    return withDash;
   };
 
   const validatemeetingId = (inputRoom: string) => {
-    const isValid: boolean = inputRoom.length === 11 ? true : false;
-    return isValid;
+    const cleaned = inputRoom.replace(/[^a-zA-Z0-9]/g, "");
+    return cleaned.length === 8;
   };
 
   return { handlemeetingIdChange, validatemeetingId };

@@ -1,6 +1,4 @@
-import { Flex, Textarea, Button } from "@chakra-ui/react";
 import React, { useState } from "react";
-import { FaPaperPlane } from "react-icons/fa";
 import { ChatMessage } from "./Types";
 import { useChatMessage } from "./useChatMessage";
 import { useMember } from "../../../members/MemberServiceContext";
@@ -9,6 +7,7 @@ export const ChatInputBox = () => {
   const [newMessage, setNewMessage] = useState("");
   const { sendChatMessage } = useChatMessage();
   const { members } = useMember();
+
   const handleMessageSend = () => {
     if (newMessage.trim() === "") return;
 
@@ -23,20 +22,10 @@ export const ChatInputBox = () => {
     sendChatMessage(newChatMessage);
     setNewMessage("");
   };
+
   return (
-    <Flex
-      height="100px"
-      p={2}
-      borderTop="1px solid"
-      borderColor="gray.400"
-      borderRadius="md"
-      position="fixed"
-      bottom={2}
-      right={2}
-      align="end"
-      width={"340px"}
-    >
-      <Textarea
+    <div className="relative">
+      <textarea
         value={newMessage}
         onChange={(e) => setNewMessage(e.target.value)}
         onKeyDown={(e) => {
@@ -45,23 +34,24 @@ export const ChatInputBox = () => {
             handleMessageSend();
           }
         }}
-        placeholder="Type your message..."
-        size="sm"
-        flex="1"
-        mr={2}
-        borderRadius="md"
-        height="90%"
+        placeholder="Type a message..."
+        className="w-full bg-[var(--bg-secondary)] border border-[var(--border-subtle)] rounded-xl py-3 pl-4 pr-12 text-sm focus:outline-none focus:border-[var(--accent-primary)] focus:bg-white transition-all resize-none min-h-[44px] max-h-[120px] shadow-inner"
+        rows={1}
       />
-      <Button
-        bottom={0}
+      <button
         onClick={handleMessageSend}
-        colorScheme="blue"
-        size="sm"
-        leftIcon={<FaPaperPlane />}
-        borderRadius="md"
+        disabled={!newMessage.trim()}
+        className={`absolute right-2 bottom-2 p-1.5 rounded-lg transition-all duration-200 
+          ${newMessage.trim() 
+            ? "text-[var(--accent-primary)] hover:bg-[var(--accent-primary)]/10" 
+            : "text-[var(--text-muted)] opacity-50 cursor-not-allowed"
+          }`}
       >
-        Send
-      </Button>
-    </Flex>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <line x1="22" y1="2" x2="11" y2="13"></line>
+          <polyline points="22 2 15 22 11 13 2 9 22 2"></polyline>
+        </svg>
+      </button>
+    </div>
   );
 };

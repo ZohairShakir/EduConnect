@@ -1,6 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.setupSocketHandlers = void 0;
+const attendanceStore_1 = require("./store/attendanceStore");
+const sessionStore_1 = require("./store/sessionStore");
 const users = {};
 const meetings = {};
 const setupSocketHandlers = (io) => {
@@ -16,6 +18,10 @@ const setupSocketHandlers = (io) => {
             socket.join(meetingId);
             console.log(`[socket] create-meeting: ${meetingId}, organizer=${name}, socket=${socket.id}`);
             console.log(`[socket] meetings=${JSON.stringify(meetings[meetingId])}`);
+            // If this meetingId corresponds to a REST-created session, attach host as participant.
+            if ((0, sessionStore_1.getSessionById)(meetingId)) {
+                (0, sessionStore_1.upsertSessionParticipant)(meetingId, socket.id, name);
+            }
             io.to(socket.id).emit("meeting-created", {
                 meetingId,
                 status: "created",
@@ -52,9 +58,19 @@ const setupSocketHandlers = (io) => {
                 socket.join(meetingId);
                 console.log(`[socket] join-meeting: ${meetingId}, name=${name}, status=${status}, socket=${socket.id}`);
                 io.to(socket.id).emit("join-meeting-response", { status, meetingId });
+                // Attendance + session participant tracking
+                if ((0, sessionStore_1.getSessionById)(meetingId)) {
+                    (0, sessionStore_1.upsertSessionParticipant)(meetingId, socket.id, name);
+                    (0, attendanceStore_1.markJoin)({ sessionId: meetingId, userId: socket.id, name });
+                }
                 if (status === "started") {
                     socket.to(meetingId).emit("new-user-joined", {
                         socketId: socket.id,
+                        name,
+                    });
+                    socket.to(meetingId).emit("user-joined", {
+                        userId: socket.id,
+                        sessionId: meetingId,
                         name,
                     });
                 }
@@ -65,6 +81,29 @@ const setupSocketHandlers = (io) => {
                     meetingId,
                 });
             }
+        });
+        socket.on("leave-meeting", ({ meetingId }) => {
+            if (!meetingId)
+                return;
+            const record = (0, attendanceStore_1.markLeave)({ sessionId: meetingId, userId: socket.id });
+            socket.to(meetingId).emit("user-left", {
+                userId: socket.id,
+                sessionId: meetingId,
+                duration: record?.duration,
+            });
+            socket.leave(meetingId);
+        });
+        socket.on("disconnect", () => {
+            const user = users[socket.id];
+            if (user?.meetingId) {
+                const record = (0, attendanceStore_1.markLeave)({ sessionId: user.meetingId, userId: socket.id });
+                socket.to(user.meetingId).emit("user-left", {
+                    userId: socket.id,
+                    sessionId: user.meetingId,
+                    duration: record?.duration,
+                });
+            }
+            delete users[socket.id];
         });
         socket.on("offer", (data) => {
             io.to(data.to).emit("onOffer", { from: socket.id, ...data });

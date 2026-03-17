@@ -54,7 +54,7 @@ export const useJoinMeetingHooks = () => {
       stream: webCamStream!,
       isEnabled: isWebCamEnabled,
     });
-    navigate(`/${meetingId}`);
+    navigate(`/meet/${meetingId}`);
     setMeetingStatus(status);
   };
 

@@ -1,8 +1,10 @@
-import { Box, CloseButton, Flex } from "@chakra-ui/react";
 import React from "react";
 import { PanelType } from "../../MainView";
 import { ChatPanel } from "../chat/ChatPanel";
 import { PeoplePanel } from "../people-panel/PeoplePanel";
+import { DoubtsPanel } from "../tools/DoubtsPanel";
+import { WhiteboardPanel } from "../tools/WhiteboardPanel";
+import { NotesPanel } from "../tools/NotesPanel";
 
 interface DrawerPanelProps {
   isOpen: boolean;
@@ -13,39 +15,33 @@ interface DrawerPanelProps {
 export const DrawerPanel = (props: DrawerPanelProps) => {
   const { isOpen, onClose, activePanel } = props;
 
+  if (!isOpen) return null;
+
   return (
-    <>
-      {isOpen && (
-        <Box
-          position="fixed"
-          right="0"
-          bottom="0"
-          w="350px"
-          h="96%"
-          bg="gray.800"
-          color="white"
-          boxShadow="xl"
-          zIndex="overlay"
-          borderRadius="md"
-          overflowY="auto"
+    <div className="fixed top-14 right-4 bottom-4 w-[350px] bg-[var(--bg-primary)] border border-[var(--border-subtle)] z-50 rounded-xl flex flex-col overflow-hidden animate-in slide-in-from-right duration-200">
+      <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border-subtle)]">
+        <h2 className="text-lg font-bold text-[var(--text-primary)]">
+          {activePanel === PanelType.people ? "People" : "Chat"}
+        </h2>
+        <button 
+          onClick={onClose}
+          className="p-1 rounded-md text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-colors"
         >
-          <Flex
-            justifyContent="space-between"
-            alignItems="center"
-            borderBottom="1px solid"
-            borderColor="gray.500"
-          >
-            <Box ml={6} fontSize="xl" fontWeight="bold" my={6}>
-              {activePanel === PanelType.people ? "People" : "Chat"}
-            </Box>
-            <CloseButton mx={10} mb={2} onClick={onClose} size="xl" />
-          </Flex>
-          <Box height="90%">
-            {activePanel === PanelType.people && <PeoplePanel />}
-            {activePanel === PanelType.chat && <ChatPanel />}
-          </Box>
-        </Box>
-      )}
-    </>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="12"></line>
+            <path d="M18 6L6 18M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      
+      <div className="flex-1 overflow-y-auto bg-[var(--bg-secondary)]">
+        {activePanel === PanelType.people && <PeoplePanel />}
+        {activePanel === PanelType.chat && <ChatPanel />}
+        {activePanel === PanelType.doubts && <DoubtsPanel />}
+        {activePanel === PanelType.whiteboard && <WhiteboardPanel />}
+        {activePanel === PanelType.notes && <NotesPanel />}
+      </div>
+    </div>
   );
 };

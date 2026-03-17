@@ -1,0 +1,47 @@
+/* local-webcam.css — Light theme */
+
+.webcam-wrapper { width: 100%; }
+
+.webcam-video-area {
+  position: relative; width: 100%; padding-top: 56.25%;
+  background: var(--bg-secondary);
+  border-radius: 10px; overflow: hidden;
+  border: 1px solid var(--border-muted);
+}
+
+.webcam-avatar {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg-secondary);
+}
+
+.webcam-controls {
+  position: absolute; bottom: 12px; left: 50%;
+  transform: translateX(-50%);
+  display: flex; gap: 8px; z-index: 10;
+}
+
+.webcam-ctrl-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 34px; height: 34px; border-radius: 50%;
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--border-muted);
+  color: var(--text-secondary);
+  cursor: pointer; transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.webcam-ctrl-btn:hover {
+  background: var(--gradient-primary);
+  border-color: transparent; color: #fff;
+  box-shadow: 0 4px 12px var(--accent-glow);
+}
+.webcam-ctrl-btn--off {
+  background: rgba(239,68,68,0.1);
+  border-color: rgba(239,68,68,0.3);
+  color: #ef4444;
+}
+.webcam-ctrl-btn--off:hover {
+  background: rgba(239,68,68,0.2);
+  border-color: rgba(239,68,68,0.5);
+}
